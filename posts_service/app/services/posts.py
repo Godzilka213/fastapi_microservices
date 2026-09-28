@@ -31,7 +31,7 @@ class PostService:
         return [PostSchema.model_validate(post) for post in db_posts]
 
     async def create_post(self, post: PostBase) -> PostSchema | None:
-        # Если вернёшь проверку категории — тут можно вернуть None при невалидной category_id
+        # Если вернёшь проверку категории - тут можно вернуть None при невалидной category_id
         db_post = await self.post_repo.create(
             title=post.title,
             content=post.content,
