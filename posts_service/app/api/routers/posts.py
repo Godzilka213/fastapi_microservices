@@ -1,5 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
+
+from categories_service.app.core.dependencies import get_category_service
+
 from app.core.dependencies import get_post_service
 from app.schemas.post import Post, PostBase
 from app.services.posts import PostService
@@ -20,19 +23,6 @@ async def read_posts(
     """Получить список всех постов."""
 
     posts = await post_service.get_all_posts(skip=skip, limit=limit)
-    return posts
-
-
-@router.get("/", response_model=list[Post])
-async def read_posts(
-        category_id: int,
-        skip: int = 0,
-        limit: int = 100,
-        post_service: PostService = Depends(get_post_service)  # Инъекция сервиса поста
-):
-    """Получить список всех постов по категории."""
-
-    posts = await post_service.get_post_by_id(category_id=category_id, skip=skip, limit=limit)
     return posts
 
 

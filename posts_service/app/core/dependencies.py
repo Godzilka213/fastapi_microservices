@@ -16,6 +16,6 @@ def get_post_repository(db: AsyncSession = Depends(get_async_db)) -> PostReposit
 
 
 def get_post_service(
-        post_repo: PostRepository = Depends(get_post_repository)
+        post_repo: PostRepository = Depends(get_post_repository),
 ) -> PostService:
     return PostService(post_repo=post_repo)
