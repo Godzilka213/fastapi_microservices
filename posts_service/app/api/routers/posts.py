@@ -13,16 +13,18 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[Post])
+@router.get("/", response_model=List[Post])
 async def read_posts(
+        category_id: Optional[int] = None,
         skip: int = 0,
         limit: int = 100,
-        post_service: PostService = Depends(get_post_service)  # Инъекция сервиса поста
+        post_service: PostService = Depends(get_post_service),  # Инъекция сервиса поста
 ):
-    """Получить список всех постов."""
+    """Получить список всех постов или постов по ID категории."""
 
-    posts = await post_service.get_all_posts(skip=skip, limit=limit)
-    return posts
+    if category_id is not None:
+        return await post_service.get_posts_by_category(category_id=category_id, skip=skip, limit=limit)
+    return await post_service.get_all_posts(skip=skip, limit=limit)
 
 
 @router.post("/", response_model=Post, status_code=status.HTTP_201_CREATED)
@@ -50,16 +52,3 @@ async def read_post(
         raise HTTPException(status_code=404, detail="Post not found")
     return db_post
 
-
-@router.get("/", response_model=List[Post])
-async def read_posts(
-        category_id: Optional[int] = None,
-        skip: int = 0,
-        limit: int = 100,
-        post_service: PostService = Depends(get_post_service),  # Инъекция сервиса поста
-):
-    """Получить список всех постов или постов по ID категории."""
-
-    if category_id is not None:
-        return await post_service.get_posts_by_category(category_id=category_id, skip=skip, limit=limit)
-    return await post_service.get_all_posts(skip=skip, limit=limit)

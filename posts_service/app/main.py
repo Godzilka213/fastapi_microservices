@@ -4,15 +4,19 @@ from fastapi import FastAPI
 
 from app.api.routers import posts
 from app.core.database import create_db_and_tables
+from app.core.rabbitmq import category_validator_instance
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Приложение запускается. Создаем базу данных...")
+    print("Приложение постов запускается. Создаем базу данных и подключаемся к RabbitMQ...")
     await create_db_and_tables()
-    print("База данных инициализирована.")
+    await category_validator_instance.connect()  # Подключаемся к RabbitMQ
+    print("Инициализация завершена.")
     yield
-    print("Приложение завершает работу.")
+    print("Приложение постов завершает работу. Закрываем соединение с RabbitMQ...")
+    await category_validator_instance.close()  # Закрываем соединение
+    print("Работа завершена.")
 
 
 app = FastAPI(
@@ -26,4 +30,4 @@ app.include_router(posts.router)
 @app.get("/")
 async def root():
     """Корневой эндпоинт."""
-    return {"message": "Это первый проект на микросервисах"}
+    return {"message": "Это проект из курса 'Продвинутый FastAPI для продолжающих'"}
